@@ -1,5 +1,5 @@
 # Expense Tracker CLI
-#### Video Demo:  <URL HERE>
+#### Video Demo:  https://youtu.be/Lc-Hwg0TP2w
 #### Description:
 
 Expense Tracker CLI is a robust Python-based command-line application designed to help users efficiently manage their personal finances. Tracking expenses is a universal problem, and this application provides a sleek, interactive terminal interface to record, categorize, and analyze spending behavior over time. The project is built leveraging modern Python libraries to deliver features like budget tracking, encrypted notes, and comprehensive data export capabilities including Excel and PDF reports with embedded charts.

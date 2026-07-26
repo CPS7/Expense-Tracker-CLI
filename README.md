@@ -1,155 +1,41 @@
----
-
 # Expense Tracker CLI
+#### Video Demo:  <URL HERE>
+#### Description:
 
-![Release](https://img.shields.io/badge/release-v1.0.0-blue)
+Expense Tracker CLI is a robust Python-based command-line application designed to help users efficiently manage their personal finances. Tracking expenses is a universal problem, and this application provides a sleek, interactive terminal interface to record, categorize, and analyze spending behavior over time. The project is built leveraging modern Python libraries to deliver features like budget tracking, encrypted notes, and comprehensive data export capabilities including Excel and PDF reports with embedded charts.
 
-A Python CLI app to manage personal expenses with budgets, analytics, exports, and optional encrypted notes.
+## Project Architecture & Design Choices
 
----
+When designing this application, the primary goal was to create a tool that is both feature-rich and easy to use directly from the terminal. A graphical user interface (GUI) was considered, but a CLI approach was chosen to ensure lightweight performance and ease of deployment across different environments. 
 
-If you like this tool, ⭐ it on GitHub!
+For the user interface, the `rich` library was selected over standard terminal printing. `rich` allows for beautiful, interactive elements like tables, panels, and styled prompts, which significantly elevates the user experience compared to plain text.
 
-## **Features**
+Data persistence is handled via SQLite. Instead of writing raw SQL queries, the SQLAlchemy Object-Relational Mapper (ORM) was utilized. This design choice provides a robust schema definition, simplifies database migrations, and protects against SQL injection vulnerabilities. The database schema encompasses several tables:
+* `categories`: To store standard and user-defined expense categories.
+* `expenses`: To log individual transactions, amounts, and dates.
+* `budgets`: To track monthly spending limits per category.
+* `expense_history`: To maintain an audit log of creation, updates, and soft deletions.
 
-* Add, update, and soft-delete expenses
-* Categorize expenses and track monthly budgets
-* View monthly totals per category
-* Filter/search expenses by category, date, amount, or keyword
-* Export to **Excel (.xlsx)** and **PDF (.pdf)**
-* Optional **note encryption** using Fernet
-* Spending trend visualization (ASCII + chart embedded in PDF)
-* Rich interactive CLI with tables, prompts, and panels
+Security and privacy were also key considerations. Since financial data can be sensitive, an optional encryption feature was implemented using the `cryptography` library (specifically Fernet symmetric encryption) to encrypt transaction notes. This ensures that even if the database file is accessed by an unauthorized party, the contextual details of the expenses remain secure.
 
----
+For data portability, the application supports exporting records to both Excel (`openpyxl`) and PDF (`fpdf`). A charting feature was integrated using `matplotlib` to visually represent spending trends, and these charts are automatically embedded into the generated PDF reports.
 
-## **Tech Stack**
+## File Descriptions
 
-* **Python 3.10+**
-* **SQLite** via **SQLAlchemy ORM**
-* CLI UI: [`rich`](https://github.com/Textualize/rich)
-* PDF export: [`fpdf`](https://pypi.org/project/fpdf/)
-* Excel export: [`openpyxl`](https://pypi.org/project/openpyxl/)
-* Charting: [`matplotlib`](https://matplotlib.org/)
-* Optional encryption: [`cryptography`](https://cryptography.io/)
+The project repository consists of the following key files:
 
----
+* **`main.py`**: This is the core executable of the application. It contains the CLI routing logic, the SQLAlchemy database models, and the implementation of all primary features (adding expenses, viewing summaries, handling exports). The application loop and interactive menus are orchestrated from this file.
+* **`test.py`**: Contains unit tests for the application to ensure that the core logic, such as budget calculation, encryption/decryption routines, and database interactions, function as expected. Testing is crucial to prevent regressions as new features are added.
+* **`requirements.txt`**: Lists all the third-party Python packages required to run the application, including `rich`, `SQLAlchemy`, `fpdf`, `openpyxl`, `matplotlib`, and `cryptography`.
+* **`.env.template`**: A template for the environment variables required to configure the application, specifically the encryption key (`EXPENSE_KEY`) and the toggle to enable/disable note encryption (`EXPENSE_ENCRYPT_NOTES`).
+* **`README.md`**: This file, providing an overview of the project, setup instructions, and documentation required for the CS50 final project submission.
 
-## **Setup**
+## Setup and Installation
 
-1. **Clone repo**
+1. Clone the repository to your local machine.
+2. Create and activate a Python virtual environment to isolate dependencies.
+3. Install the required packages using `pip install -r requirements.txt`.
+4. (Optional) Copy `.env.template` to `.env` and configure your encryption key if you wish to use the secure notes feature.
+5. Run the application using `python main.py` and follow the interactive prompts to start tracking your expenses.
 
-```bash
-git clone https://github.com/CPS7/Expense-Tracker-CLI.git
-cd Expense-Tracker-CLI
-```
-
-2. **Create virtual environment**
-
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux / macOS
-venv\Scripts\activate     # Windows
-```
-
-3. **Install dependencies**
-
-```bash
-pip install -r requirements.txt
-```
-
-4. **Optional: Enable note encryption**
-
-Create a `.env` file with:
-
-```
-EXPENSE_ENCRYPT_NOTES=1
-EXPENSE_KEY=<your_32byte_base64_key>
-```
-
-> Key must be **32 url-safe base64 bytes**. Encryption can be disabled by setting `EXPENSE_ENCRYPT_NOTES=0` or leaving `EXPENSE_KEY` empty.
-
----
-
-## **Usage**
-
-Run the CLI app:
-
-```bash
-python main.py
-```
-
-You’ll see a menu like:
-
-```
-1. Add Expense
-2. View Expenses
-3. Soft Delete Expense
-...
-14. Exit
-```
-
-* Navigate with number input
-* Follow prompts for amount, date, note, category, etc.
-* Export options available for Excel and PDF reports
-
----
-
-## **Examples**
-
-**Add an expense:**
-
-```text
-Amount (₹): 500
-Note: Groceries
-Date (YYYY-MM-DD): 2025-11-15
-Category: Food
-Currency: INR
-✔ Expense saved (id: 1)
-```
-
-**View monthly category totals:**
-
-```text
-Category Totals - November 2025
--------------------------------
-Food          1500.00
-Transport      800.00
-Utilities      300.00
--------------------------------
-Total all categories: 2600.00
-```
-
-**Export filtered expenses to PDF with trend chart**
-
-```
-Search & Export -> Export as PDF -> Embed trend chart: Yes
-✔ PDF exported: expenses_report_20251115_221530.pdf
-```
-
----
-
-## **Database Schema**
-
-* `categories` → Expense categories
-* `expenses` → Stores individual expenses
-* `budgets` → Monthly budgets per category
-* `expense_history` → Tracks create/update/delete actions
-* `meta_info` → Schema version info
-
----
-
-## **Notes**
-
-* Soft delete sets `deleted=True`; hard delete removes record.
-* Notes cannot be searched reliably if encryption is enabled.
-* Budgets trigger warnings at **80% spent** and **100% exceeded**.
-* Trend charts are embedded in PDF; temporary files are cleaned automatically.
-
----
-
-## **License**
-
-MIT License © 2025 CPS7
-
----
+By combining a functional ORM, a polished CLI interface, and practical data export options, the Expense Tracker CLI serves as a comprehensive tool for personal financial management and demonstrates a solid integration of various software engineering principles.
